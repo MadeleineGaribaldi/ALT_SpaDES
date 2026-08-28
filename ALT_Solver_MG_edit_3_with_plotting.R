@@ -186,6 +186,10 @@ ALTparameters[
     function(Ts, A, month, p, k, d, b) {
       r <- ALT_Solver(
         Ts, A, month, p, k, d, b,
+        #z_search,
+        #ppp_grid,
+        #overresolve,
+        #tol,
         verbose = FALSE,
         plot_check = FALSE
       )$roots
