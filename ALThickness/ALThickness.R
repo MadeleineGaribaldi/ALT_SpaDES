@@ -17,7 +17,7 @@ defineModule(sim, list(
   timeunit = "year",
   citation = list("citation.bib"),
   documentation = list("NEWS.md", "README.md", "ALThickness.Rmd"),
-  reqdPkgs = list("SpaDES.core (>= 3.1.2)", "ggplot2", "data.table",),
+  reqdPkgs = list("SpaDES.core (>= 3.1.2)", "ggplot2", "data.table","purrr", "dyplr"),
   parameters = bindrows(
     #defineParameter("paramName", "paramClass", value, min, max, "parameter description"),
     defineParameter(".plots", "character", "screen", NA, NA,
@@ -30,9 +30,20 @@ defineModule(sim, list(
                     "Describes the simulation time at which the first save event should occur."),
     defineParameter(".saveInterval", "numeric", NA, NA, NA,
                     "This describes the simulation time interval between save events."),
-    defineParameter(".studyAreaName", "character", NA, NA, NA,
-                    "Human-readable name for the study area used - e.g., a hash of the study",
-                          "area obtained using `reproducible::studyAreaName()`"),
+    defineParameter("z_search", "numeric", NA, 0, 5,
+                    "range of depths the ALT_solver in meters. Increasing this number will increase processing time.
+                    may give erroneous permafrost presence for depths > 5m"),
+    defineParameter("grid_ppp", "numeric", 25, NA, NA, "grid points per period. Should sample often enough within each
+                    sine wave to detect all temperature crossings. Increasing will increase processing time, decreasing
+                    may miss crossing"),
+    defineParameter("overresolve", "numeric", 1.2, NA, NA, "multiplier than increases the number of grid points beyond
+                    the minimum required by grid_ppp. Increasing this value will increase processing time"),
+    defineParameter("tol", "numeric", 1e-10, NA ,NA, "number of decimal points for each root"),
+    defineParameter("verbose", "logical", FALSE, NA, NA, "If TRUE, gives diagnostice messages while the solver runs.
+                     Can be useful for development and debugging but increases processing time"),
+    defineParameter("plot_check", "logical", FALSE, NA, NA, "If TRUE, produces a diagnostic plot showing the behavior
+                    of the ALT_Solver function over the search range. Can be useful for validation and debugging
+                    but increases processing time"),
     ## .seed is optional: `list('init' = 123)` will `set.seed(123)` for the `init` event only.
     defineParameter(".seed", "list", list(), NA, NA,
                     "Named list of seeds to use for each event (names)."),
@@ -55,8 +66,8 @@ defineModule(sim, list(
   ),
   inputObjects = bindrows(
     #expectsInput("objectName", "objectClass", "input object description", sourceURL, ...),
-    expectsInput("gParameters", objectClass = "data.table", desc = "Calibrated model parameters based on peatland type", sourceURL = NA),
-    expectsInput("siteInfo", objectClass = "data.table", desc = "Annual model variables including year, surface temperature, temperature amplitude, and site information")
+    expectsInput("gParameters", objectClass = "data.table", desc = "Calibrated model parameters based on peatland type", "sourceURL = https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON"),
+    expectsInput("siteInfo", objectClass = "data.table", desc = "Annual model variables including year, surface temperature, temperature amplitude, and site information", "sourceURL = https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON")
   ),
   outputObjects = bindrows(
     #createsOutput("objectName", "objectClass", "output object description", ...),
@@ -68,73 +79,25 @@ doEvent.ALThickness = function(sim, eventTime, eventType) {
   switch(
     eventType,
     init = {
+      sim <- Init(sim)
       ### check for more detailed object dependencies:
       ### (use `checkObject` or similar)
 
       # do stuff for this event
-      # MG Load data tables?
-      
-      #MG Site information 
-      siteInfo <- sim$siteInfo
-      
-      # MG Calibrated model parameters based on peatland type
-      # Can change based on calibration script
-      gParameters <- sim$gParameters 
-      
-      #MG merge into one to assign model parameters to site based on peatland 
-      #class
-      siteParameters <- merge (siteInfo,gParameters, by="Peatland")
-      
-      #MG make a data table for the monthly ALT calculation
-      #Can be adjusted by user
-      months = data.table(month = 5:10)
-      
-      #MG make a new data table and combine the data tables so each site has 
-      #an entry for each month
-      ALTparameters <- data.table(NULL)
-      ALTparameters <- cross_join(siteParameters, months)
-      
-      #MG run the ALT solver function for each month at each site
-      #In the function there are 6 parameters which have a default that can be
-      #changed by the user
-      
-      ALTparameters[
-        ,
-        roots := mapply(
-          function(Ts, A, month, p, k, d, b) {
-            r <- ALT_Solver(
-              Ts, A, month, p, k, d, b,
-              #z_search,     # range of depths to search for depth where 
-                             # temperature equals 0
-              #ppp_grid,     # grid points per period --> smaller may miss
-                             # depths where temperature equals 0, larger may
-                             # may increase processing time
-              #overresolve,  # multiplier that increases the number of grid
-                             # points beyond the minimum required by grid_ppp
-              #tol,          # tolerance which assigns the number of decimal 
-                             # points for output depths
-              verbose = FALSE, # print function progress messages (default is True)
-              plot_check = FALSE # creates graph of roots for visual verification
-            )$roots
-            if (length(r) == 0) NA_real_ else min(r)
-          },
-          Ts, A, month, p, k, d, b
-        )
-      ]
-      
-      # MG removes NAs and calculates annual maximum thaw depth (ALT)
-      ALTparameters <- ALLparameters[!is.na(roots)]
-      ALTfinal <- ALTparameters[
-        ,
-        .SD[which.max(roots)],
-        by = .(Year, Site)
-      ]
-      
-      
 
       # schedule future event(s)
-      sim <- scheduleEvent(sim, P(sim)$.plotInitialTime, "ALThickness", "plot")
-      sim <- scheduleEvent(sim, P(sim)$.saveInitialTime, "ALThickness", "save")
+      scheduleEvent(sim, start(sim),
+                    "ALThickness", "ALTcalc", eventPriority = 1)
+      scheduleEvent(sim, start(sim),
+                    "ALThickness", "ALTfinal", eventPriority = 2) #these are given twice is that correct?
+      if (!any(is.na(P(sim)$.plots))) {
+        scheduleEvent(sim, start(sim),
+                      "ALThickness", "plots", eventPriority = 3) #this is given twice is that correct?
+      }
+      
+      #Are these necessary?
+      #sim <- scheduleEvent(sim, P(sim)$.plotInitialTime, "ALThickness", "plot")
+      #sim <- scheduleEvent(sim, P(sim)$.saveInitialTime, "ALThickness", "save")
     },
     plot = {
       # ! ----- EDIT BELOW ----- ! #
@@ -162,43 +125,47 @@ doEvent.ALThickness = function(sim, eventTime, eventType) {
 
       # ! ----- STOP EDITING ----- ! #
     },
-    event1 = {
+     
       # ! ----- EDIT BELOW ----- ! #
       # do stuff for this event
-
-      # e.g., call your custom functions/methods here
-      # you can define your own methods below this `doEvent` function
-
-      # schedule future event(s)
-
-      # e.g.,
-      # sim <- scheduleEvent(sim, time(sim) + increment, "ALThickness", "templateEvent")
+    ALTcalc= {
+      sim <- ALTestimation(sim)
+      scheduleEvent(sim, time(sim) + 1,
+                    "ALThickness", "ALTcalc", eventPriority = 1)
 
       # ! ----- STOP EDITING ----- ! #
     },
-    event2 = {
+    ALTfinal = {
       # ! ----- EDIT BELOW ----- ! #
       # do stuff for this event
-
-      # e.g., call your custom functions/methods here
-      # you can define your own methods below this `doEvent` function
-
-      # schedule future event(s)
-
-      # e.g.,
-      # sim <- scheduleEvent(sim, time(sim) + increment, "ALThickness", "templateEvent")
+      sim <- ALTmaximum(sim)
+      
+      scheduleEvent(sim, time(sim) + 1,
+                    "ALT_Thickness", "ALTfinal", eventPriority = 2)
 
       # ! ----- STOP EDITING ----- ! #
     },
-    warning(noEventWarning(sim))
+    
+    plots = {
+      sim <- plotALT(sim)
+      
+      scheduleEvent(sim, time(sim) + 1,
+                    "ALT_Thickness", "plots", eventPriority = 3)
+    }
+    warning(noEventWarning(sim)) # do I need this?
   )
-  return(invisible(sim))
+  return(invisible(sim)) # do I need this?
 }
 
 ### template initialization
 Init <- function(sim) {
   # # ! ----- EDIT BELOW ----- ! #
-
+  siteParameters = merge(siteInfo,gParameters, by="Peatland")
+  
+  months = data.table(month = 5:10)
+  
+  ALTparameters <- data.table(NULL)
+  ALTparameters <- cross_join(siteParameters, months)
   # ! ----- STOP EDITING ----- ! #
 
   return(invisible(sim))
@@ -225,24 +192,45 @@ plotFun <- function(sim) {
 }
 
 ### template for your event1
-Event1 <- function(sim) {
+ALTestimation <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
-  # THE NEXT TWO LINES ARE FOR DUMMY UNIT TESTS; CHANGE OR DELETE THEM.
-  # sim$event1Test1 <- " this is test for event 1. " # for dummy unit test
-  # sim$event1Test2 <- 999 # for dummy unit test
+  ALTparameters2 <- copy(mod$ALTparameters)
+  ALTparameters2[
+    ,
+    ALT := pmap_dbl(
+      list(Ts, A, month, p, k, d, b),
+      ALT_Solver_dataT
+    )
+  ]
+  ALTparameters2 <- ALTparameters2[!is.na(roots)]
+  mod$ALTparameters <- ALTparameters2
 
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
 }
 
 ### template for your event2
-Event2 <- function(sim) {
+ALTmaxiumum <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
-  # THE NEXT TWO LINES ARE FOR DUMMY UNIT TESTS; CHANGE OR DELETE THEM.
-  # sim$event2Test1 <- " this is test for event 2. " # for dummy unit test
-  # sim$event2Test2 <- 777  # for dummy unit test
+    ALTparameters2 <- copy(mod$ALTparameters)
+    ALTfinal <- ALTparameters2[,.SD[which.max(ALT)],
+      by = .(Year, Site)
+    ]
+    ALTfinal <- ALTparameters2$maxALT
+    
+    sim$ALTfinal <- ALTfinal
 
   # ! ----- STOP EDITING ----- ! #
+  return(invisible(sim))
+}
+
+plotALT <- function(sim) {
+  
+  checkPath(file.path(outputPath(sim), "figures"), create = TRUE)
+  
+  Plots(...,
+        types = P(sim)$.plots)
+  
   return(invisible(sim))
 }
 
@@ -261,12 +249,22 @@ Event2 <- function(sim) {
   #   sim$map <- Cache(prepInputs, extractURL('map')) # download, extract, load file from url in sourceURL
   # }
 
-  #cacheTags <- c(currentModule(sim), "function:.inputObjects") ## uncomment this if Cache is being used
+  cacheTags <- c(currentModule(sim), "function:.inputObjects") ## uncomment this if Cache is being used
   dPath <- asPath(getOption("reproducible.destinationPath", dataPath(sim)), 1)
   message(currentModule(sim), ": using dataPath '", dPath, "'.")
 
   # ! ----- EDIT BELOW ----- ! #
-
+  if(!suppliedElsewhere("siteInfo", sim)){
+    siteInfo <- prepInputs(url = extractURL("siteInfo"),
+                           dpath)
+    Cache(userTags = cacheTags)
+  }
+  
+  if(!suppliedElsewhere("gParameters", sim)){
+    gParameters <- prepInputs(url = extractURL("gParameters"),
+                              dpath)
+    Cache(userTags = cacheTags)
+  }
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
 }
