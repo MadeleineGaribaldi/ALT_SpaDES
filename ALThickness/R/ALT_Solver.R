@@ -1,8 +1,4 @@
-###Active Layer Thickness Solver###
-
-
 # ---------- Utilities ----------
-#Creates a safe exponent to prevent overflow 
 safe_exp <- function(x, clip = 700) {
   # Prevent Inf from overflow; exp(> ~709) overflows in double precision.
   x <- pmin(x, clip)
@@ -18,18 +14,21 @@ bracket_sign_changes <- function(f, zmin, zmax, n_grid) {
   # Check for sign changes and account for values at exactly 0
   f_signs <- sign(f_vals)
   # Find where signs differ 
-  idx <- which(f_signs[-1] * f_signs[-length(f_signs)] < 0)  # sign changes
+  idx <- which(f_signs[-1] * f_signs[-length(f_signs)] <= 0)  # sign changes
   # Return early if no crossings found
   if (!length(idx))
     return(list(intervals = list(), z_grid = z_grid, f_vals = f_vals))
   # Matrix-to-list conversion for intervals
   int_matrix <- rbind(z_grid[idx], z_grid[idx+1])
-  intervals <- lapply(idx, function(i) c(z_grid[i], z_grid[i + 1]))
+  intervals <- map(
+    idx,
+    \(i) c(z_grid[i], z_grid[i + 1])
+  )
   names(intervals) <- NULL
   list(intervals = intervals, z_grid = z_grid, f_vals = f_vals)
 }
 
-#Find a single root (0) of a function (f) within a specified interval (a,b) and with a high tolerance (tol)
+
 refine_root <- function(f, a, b, tol = 1e-10) {
   uniroot(f, interval = c(a, b), tol = tol)$root
 }
@@ -39,7 +38,7 @@ plot_solver_view <- function(f, z_search, roots = NULL, sat_intervals = NULL,
                              title = "Inequality region: f(z) < 0") {
   zmin <- z_search[1]; zmax <- z_search[2]
   z_seq <- seq(zmin, zmax, length.out = 2000)
-  vals  <- vapply(z_seq, f, numeric(1))
+  vals <- map_dbl(z_seq, f)
   plot(z_seq, vals, type = "l", lwd = 2, col = "steelblue",
        xlab = "z", ylab = "f(z)",
        main = title)
@@ -63,12 +62,12 @@ plot_solver_view <- function(f, z_search, roots = NULL, sat_intervals = NULL,
 # ---------- Main solver ----------
 ALT_Solver <- function(Ts, A, month, p,
                        k, d,b, #change based on peatland type of site
-                       z_search = c(0, 200),   # choose a physically plausible range
+                       z_search = c(0, 5),   # choose a physically plausible range
                        grid_ppp = 25,          # grid points per period (>= 20 recommended)
                        overresolve = 1.2,      # multiplier to densify the grid
                        tol = 1e-10,
-                       verbose = TRUE,
-                       plot_check = TRUE) {
+                       verbose = FALSE,
+                       plot_check = FALSE) {
   stopifnot(length(z_search) == 2, z_search[1] < z_search[2])
   
   # Define f(z)
@@ -122,7 +121,10 @@ ALT_Solver <- function(Ts, A, month, p,
   }
   
   # Step 2: refine every root with uniroot
-  roots <- vapply(intervals, function(iv) refine_root(f, iv[1], iv[2], tol = tol), numeric(1))
+  roots <- map_dbl(
+    intervals,
+    ~ refine_root(f, .x[1], .x[2], tol = tol)
+  )
   roots <- sort(unique(roots))
   
   # Step 3: determine sub-intervals where f(z) < 0
@@ -163,3 +165,18 @@ ALT_Solver <- function(Ts, A, month, p,
        grid = list(z = br$z_grid, f = br$f_vals),
        meta = list(period_z = period_z, n_grid = n_grid))
 }
+
+ALT_Solver_dataT <- function(
+    Ts, A, month, p, k, d, b,
+    ...
+) {
+  
+  r <- ALT_Solver(
+    Ts, A, month, p, k, d, b,
+    ...
+  )$roots
+  
+  if (length(r) == 0) NA_real_ else min(r)
+}
+
+
