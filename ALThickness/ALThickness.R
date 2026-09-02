@@ -66,8 +66,8 @@ defineModule(sim, list(
   ),
   inputObjects = bindrows(
     #expectsInput("objectName", "objectClass", "input object description", sourceURL, ...),
-    expectsInput("gParameters", objectClass = "data.table", desc = "Calibrated model parameters based on peatland type", "sourceURL = https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON"),
-    expectsInput("siteInfo", objectClass = "data.table", desc = "Annual model variables including year, surface temperature, temperature amplitude, and site information", "sourceURL = https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON")
+    expectsInput("gParameters", objectClass = "data.table", desc = "Calibrated model parameters based on peatland type", sourceURL = "https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON"),
+    expectsInput("siteInfo", objectClass = "data.table", desc = "Annual model variables including year, surface temperature, temperature amplitude, and site information", sourceURL = "https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON")
   ),
   outputObjects = bindrows(
     #createsOutput("objectName", "objectClass", "output object description", ...),
