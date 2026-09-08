@@ -1,6 +1,6 @@
 ---
-title: "ALThickness Manual"
-subtitle: "v.`r SpaDES.core::moduleMetadata(module = 'ALThickness', path = '..')$version`"
+title: "ALT_SpaDES Manual"
+subtitle: "v.`r SpaDES.core::moduleMetadata(module = 'ALT_SpaDES', path = '..')$version`"
 date: "Last updated: `r Sys.Date()`"
 output:
   bookdown::html_document2:
@@ -12,18 +12,18 @@ output:
     keep_md: yes
 editor_options:
   chunk_output_type: console
-bibliography: citations/references_ALThickness.bib
+bibliography: citations/references_ALT_SpaDES.bib
 link-citations: true
 always_allow_html: true
 ---
 
-# ALThickness Module
+# ALT_SpaDES Module
 
 <!-- the following are text references used in captions for LaTeX compatibility -->
-(ref:ALThickness) *ALThickness*
+(ref:ALT_SpaDES) *ALT_SpaDES*
 #MG do include the other parameters here?
 
-```{r setup-ALThickness, include=FALSE}
+```{r setup-ALT_SpaDES, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## change to eval = TRUE if all chunks are to be evaluated
 
 dir.create("figures", showWarnings = FALSE)
@@ -39,7 +39,7 @@ download.file(url = "https://img.shields.io/badge/Made%20with-Markdown-1f425f.pn
 
 #### Authors: #Do I need to add anything here?
 
-`r paste(as.character(SpaDES.core::moduleMetadata(module = "ALThickness", path = '..')$authors), sep = ', ')`
+`r paste(as.character(SpaDES.core::moduleMetadata(module = "ALT_SpaDES", path = '..')$authors), sep = ', ')`
 <!-- ideally separate authors with new lines, '\n' not working -->
 
 ## Module Overview
@@ -58,28 +58,30 @@ download.file(url = "https://img.shields.io/badge/Made%20with-Markdown-1f425f.pn
 
 ### Module summary
 
-ALThickness module calculates active layer thickness
+ALT_SpaDES module calculates active layer thickness
 
 ### Module inputs and parameters
 
 Describe input data required by the module and how to obtain it (e.g., directly from online sources or supplied by other modules)
-If `sourceURL` is specified, `downloadData("ALThickness", "C:/Users/mgaribal/Documents/test/modules")` may be sufficient.
+If `sourceURL` is specified, `downloadData("ALT_SpaDES", "C:/Users/mgaribal/Documents/test/modules")` may be sufficient.
 
-Table \@ref(tab:moduleInputs-ALThickness) shows the full list of module inputs.
+Table \@ref(tab:moduleInputs-ALT_SpaDES) shows the full list of module inputs.
 
-```{r moduleInputs-ALThickness, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-df_inputs <- SpaDES.core::moduleInputs("ALThickness", "C:/Users/mgaribal/Documents/test/modules")
+```{r moduleInputs-ALT_SpaDES, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+#Do I need to change the file path?
+df_inputs <- SpaDES.core::moduleInputs("ALT_SpaDES", "C:/Users/mgaribal/Documents/test/modules")
 knitr::kable(df_inputs,
-             caption = "List of (ref:ALThickness) input objects and their description.") |>
+             caption = "List of (ref:ALT_SpaDES) input objects and their description.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 
-Summary of user-visible parameters (Table \@ref(tab:moduleParams-ALThickness))
+Summary of user-visible parameters (Table \@ref(tab:moduleParams-ALT_SpaDES))
 
 
-```{r moduleParams-ALThickness, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-df_params <- SpaDES.core::moduleParams("ALThickness", "C:/Users/mgaribal/Documents/test/modules")
-knitr::kable(df_params, caption = "List of (ref:ALThickness) parameters and their description.") |>
+```{r moduleParams-ALT_SpaDES, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+#change file path?
+df_params <- SpaDES.core::moduleParams("ALT_SpaDES", "C:/Users/mgaribal/Documents/test/modules")
+knitr::kable(df_params, caption = "List of (ref:ALT_SpaDES) parameters and their description.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 
@@ -97,11 +99,11 @@ Write what is saved.
 
 ### Module outputs
 
-Description of the module outputs (Table \@ref(tab:moduleOutputs-ALThickness)).
+Description of the module outputs (Table \@ref(tab:moduleOutputs-ALT_SpaDES)).
 
-```{r moduleOutputs-ALThickness, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-df_outputs <- SpaDES.core::moduleOutputs("ALThickness", "C:/Users/mgaribal/Documents/test/modules")
-knitr::kable(df_outputs, caption = "List of (ref:ALThickness) outputs and their description.") |>
+```{r moduleOutputs-ALT_SpaDES, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+df_outputs <- SpaDES.core::moduleOutputs("ALT_SpaDES", "C:/Users/mgaribal/Documents/test/modules")
+knitr::kable(df_outputs, caption = "List of (ref:ALT_SpaDES) outputs and their description.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 
