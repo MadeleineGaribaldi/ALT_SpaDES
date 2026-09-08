@@ -241,13 +241,13 @@ plotFun <- function(sim) {
 
   # ! ----- EDIT BELOW ----- ! #
   if(!suppliedElsewhere("siteInfo", sim)){
-    siteInfo <- prepInputs(url = extractURL("siteInfo"),
+    sim$siteInfo <- prepInputs(url = extractURL("siteInfo"),
                            dpath)
     Cache(userTags = cacheTags)
   }
   
   if(!suppliedElsewhere("gParameters", sim)){
-    gParameters <- prepInputs(url = extractURL("gParameters"),
+    sim$gParameters <- prepInputs(url = extractURL("gParameters"),
                               dpath)
     Cache(userTags = cacheTags)
   }
