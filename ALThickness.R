@@ -5,18 +5,18 @@
 ## they are namespaced to the module, just like functions in R packages.
 ## If exact location is required, functions will be: `sim$.mods$<moduleName>$FunctionName`.
 defineModule(sim, list(
-  name = "ALT_SpaDES",
+  name = "ALThickness",
   description = paste("Determines active layer thickness"),
   keywords = c("permafrost","Active Layer Thickness"),
   authors = c(
     person("Madeleine", "Garibaldi", email = "madeleine.garibaldi@nrcan-rncan.gc.ca", role = c("aut", "cre")),
     person(c("Oleksandra (Sasha)"), "Hararuk", email = "oleksandra.hararuk@nrcan-rncan.gc.ca", role = c("aut","cre"))),
   childModules = character(0),
-  version = list(ALT_SpaDES = "1.0.0.0000"),
+  version = list(ALThickness = "1.0.0.0000"),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "year",
   citation = list("citation.bib"),
-  documentation = list("NEWS.md", "README.md", "ALT_SpaDES.Rmd"),
+  documentation = list("NEWS.md", "README.md", "ALThickness.Rmd"),
   reqdPkgs = list("SpaDES.core (>= 3.1.2)", "ggplot2", "data.table","purrr", "dyplr"),
   parameters = bindrows(
     #defineParameter("paramName", "paramClass", value, min, max, "parameter description"),
@@ -75,7 +75,7 @@ defineModule(sim, list(
   )
 ))
 
-doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
+doEvent.ALThickness = function(sim, eventTime, eventType) {
   switch(
     eventType,
     init = {
@@ -87,12 +87,12 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
 
       # schedule future event(s)
       scheduleEvent(sim, start(sim),
-                    "ALT_SpaDES", "ALTcalc", eventPriority = 1)
+                    "ALThickness", "ALTcalc", eventPriority = 1)
       scheduleEvent(sim, start(sim),
-                    "ALT_SpaDES", "ALTfinal", eventPriority = 2) #these are given twice is that correct?
+                    "ALThickness", "ALTfinal", eventPriority = 2) #these are given twice is that correct?
       if (!any(is.na(P(sim)$.plots))) {
         scheduleEvent(sim, start(sim),
-                      "ALT_SpaDES", "plots", eventPriority = 3) #this is given twice is that correct?
+                      "ALThickness", "plots", eventPriority = 3) #this is given twice is that correct?
       }
       
       #Are these necessary?
@@ -131,7 +131,7 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
     ALTcalc= {
       sim <- ALTestimation(sim)
       scheduleEvent(sim, time(sim) + 1,
-                    "ALT_SpaDES", "ALTcalc", eventPriority = 1)
+                    "ALThickness", "ALTcalc", eventPriority = 1)
 
       # ! ----- STOP EDITING ----- ! #
     },
@@ -141,7 +141,7 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
       sim <- ALTmaximum(sim)
       
       scheduleEvent(sim, time(sim) + 1,
-                    "ALT_SpaDES", "ALTfinal", eventPriority = 2)
+                    "ALT_Thickness", "ALTfinal", eventPriority = 2)
 
       # ! ----- STOP EDITING ----- ! #
     },
@@ -150,7 +150,7 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
       sim <- plotALT(sim)
       
       scheduleEvent(sim, time(sim) + 1,
-                    "ALT_SpaDES", "plots", eventPriority = 3)
+                    "ALT_Thickness", "plots", eventPriority = 3)
     }
     warning(noEventWarning(sim)) # do I need this?
   )

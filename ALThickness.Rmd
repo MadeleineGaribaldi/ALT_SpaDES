@@ -21,6 +21,7 @@ always_allow_html: true
 
 <!-- the following are text references used in captions for LaTeX compatibility -->
 (ref:ALThickness) *ALThickness*
+#MG do include the other parameters here?
 
 ```{r setup-ALThickness, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## change to eval = TRUE if all chunks are to be evaluated
@@ -36,19 +37,28 @@ download.file(url = "https://img.shields.io/badge/Made%20with-Markdown-1f425f.pn
 
 <!-- if knitting to pdf remember to add the pandoc_args: ["--extract-media", "."] option to yml in order to get the badge images -->
 
-#### Authors:
+#### Authors: #Do I need to add anything here?
 
 `r paste(as.character(SpaDES.core::moduleMetadata(module = "ALThickness", path = '..')$authors), sep = ', ')`
 <!-- ideally separate authors with new lines, '\n' not working -->
 
 ## Module Overview
 
+### Quick links #MG did I do this correctly?
+
+-   [General functioning](#general-functioning)
+
+-   [List of input objects](#input-list)
+
+-   [List of parameters](#params-list)
+
+-   [List of outputs](#outputs-list)
+
+-   [Simulation flow and module events](#sim-flow)
+
 ### Module summary
 
-Provide a brief summary of what the module does / how to use the module.
-
-Module documentation should be written so that others can use your module.
-This is a template for module documentation, and should be changed to reflect your module.
+ALThickness module calculates active layer thickness
 
 ### Module inputs and parameters
 
