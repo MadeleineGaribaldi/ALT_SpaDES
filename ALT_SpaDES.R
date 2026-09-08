@@ -5,18 +5,18 @@
 ## they are namespaced to the module, just like functions in R packages.
 ## If exact location is required, functions will be: `sim$.mods$<moduleName>$FunctionName`.
 defineModule(sim, list(
-  name = "ALThickness",
+  name = "ALT_SpaDES",
   description = paste("Determines active layer thickness"),
   keywords = c("permafrost","Active Layer Thickness"),
   authors = c(
     person("Madeleine", "Garibaldi", email = "madeleine.garibaldi@nrcan-rncan.gc.ca", role = c("aut", "cre")),
     person(c("Oleksandra (Sasha)"), "Hararuk", email = "oleksandra.hararuk@nrcan-rncan.gc.ca", role = c("aut","cre"))),
   childModules = character(0),
-  version = list(ALThickness = "1.0.0.0000"),
+  version = list(ALT_SpaDES = "1.0.0.0000"),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "year",
   citation = list("citation.bib"),
-  documentation = list("NEWS.md", "README.md", "ALThickness.Rmd"),
+  documentation = list("NEWS.md", "README.md", "ALT_SpaDES.Rmd"),
   reqdPkgs = list("SpaDES.core (>= 3.1.2)", "ggplot2", "data.table","purrr", "dyplr"),
   parameters = bindrows(
     #defineParameter("paramName", "paramClass", value, min, max, "parameter description"),
@@ -66,8 +66,8 @@ defineModule(sim, list(
   ),
   inputObjects = bindrows(
     #expectsInput("objectName", "objectClass", "input object description", sourceURL, ...),
-    expectsInput("gParameters", objectClass = "data.table", desc = "Calibrated model parameters based on peatland type", sourceURL = "https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON"),
-    expectsInput("siteInfo", objectClass = "data.table", desc = "Annual model variables including year, surface temperature, temperature amplitude, and site information", sourceURL = "https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON")
+    expectsInput("gParameters", objectClass = "data.table", desc = "Calibrated model parameters based on peatland type", "sourceURL = https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON"),
+    expectsInput("siteInfo", objectClass = "data.table", desc = "Annual model variables including year, surface temperature, temperature amplitude, and site information", "sourceURL = https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON")
   ),
   outputObjects = bindrows(
     #createsOutput("objectName", "objectClass", "output object description", ...),
@@ -75,7 +75,7 @@ defineModule(sim, list(
   )
 ))
 
-doEvent.ALThickness = function(sim, eventTime, eventType) {
+doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
   switch(
     eventType,
     init = {
@@ -87,12 +87,12 @@ doEvent.ALThickness = function(sim, eventTime, eventType) {
 
       # schedule future event(s)
       scheduleEvent(sim, start(sim),
-                    "ALThickness", "ALTcalc", eventPriority = 1)
+                    "ALT_SpaDES", "ALTcalc", eventPriority = 1)
       scheduleEvent(sim, start(sim),
-                    "ALThickness", "ALTfinal", eventPriority = 2) #these are given twice is that correct?
+                    "ALT_SpaDES", "ALTfinal", eventPriority = 2) #these are given twice is that correct?
       if (!any(is.na(P(sim)$.plots))) {
         scheduleEvent(sim, start(sim),
-                      "ALThickness", "plots", eventPriority = 3) #this is given twice is that correct?
+                      "ALT_SpaDES", "plots", eventPriority = 3) #this is given twice is that correct?
       }
       
       #Are these necessary?
@@ -131,7 +131,7 @@ doEvent.ALThickness = function(sim, eventTime, eventType) {
     ALTcalc= {
       sim <- ALTestimation(sim)
       scheduleEvent(sim, time(sim) + 1,
-                    "ALThickness", "ALTcalc", eventPriority = 1)
+                    "ALT_SpaDES", "ALTcalc", eventPriority = 1)
 
       # ! ----- STOP EDITING ----- ! #
     },
@@ -141,7 +141,7 @@ doEvent.ALThickness = function(sim, eventTime, eventType) {
       sim <- ALTmaximum(sim)
       
       scheduleEvent(sim, time(sim) + 1,
-                    "ALT_Thickness", "ALTfinal", eventPriority = 2)
+                    "ALT_SpaDES", "ALTfinal", eventPriority = 2)
 
       # ! ----- STOP EDITING ----- ! #
     },
@@ -150,7 +150,7 @@ doEvent.ALThickness = function(sim, eventTime, eventType) {
       sim <- plotALT(sim)
       
       scheduleEvent(sim, time(sim) + 1,
-                    "ALT_Thickness", "plots", eventPriority = 3)
+                    "ALT_SpaDES", "plots", eventPriority = 3)
     }
     warning(noEventWarning(sim)) # do I need this?
   )
@@ -166,28 +166,9 @@ Init <- function(sim) {
   
   ALTparameters <- data.table(NULL)
   ALTparameters <- cross_join(siteParameters, months)
+  mod$ALTparameters <- ALTparameters
   # ! ----- STOP EDITING ----- ! #
 
-  return(invisible(sim))
-}
-### template for save events
-Save <- function(sim) {
-  # ! ----- EDIT BELOW ----- ! #
-  # do stuff for this event
-  sim <- saveFiles(sim)
-
-  # ! ----- STOP EDITING ----- ! #
-  return(invisible(sim))
-}
-
-### template for plot events
-plotFun <- function(sim) {
-  # ! ----- EDIT BELOW ----- ! #
-  # do stuff for this event
-  sampleData <- data.frame("TheSample" = sample(1:10, replace = TRUE))
-  Plots(sampleData, fn = ggplotFn) # needs ggplot2
-
-  # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
 }
 
@@ -234,6 +215,15 @@ plotALT <- function(sim) {
   return(invisible(sim))
 }
 
+plotFun <- function(sim) {
+  # ! ----- EDIT BELOW ----- ! #
+  # do stuff for this event
+  sampleData <- data.frame("TheSample" = sample(1:10, replace = TRUE))
+  Plots(sampleData, fn = ggplotFn) # needs ggplot2
+  
+  # ! ----- STOP EDITING ----- ! #
+  return(invisible(sim))
+}
 .inputObjects <- function(sim) {
   # Any code written here will be run during the simInit for the purpose of creating
   # any objects required by this module and identified in the inputObjects element of defineModule.
