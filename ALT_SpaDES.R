@@ -26,24 +26,20 @@ defineModule(sim, list(
                     "Describes the simulation time at which the first plot event should occur."),
     defineParameter(".plotInterval", "numeric", NA, NA, NA,
                     "Describes the simulation time interval between plot events."),
-    defineParameter(".saveInitialTime", "numeric", NA, NA, NA,
-                    "Describes the simulation time at which the first save event should occur."),
-    defineParameter(".saveInterval", "numeric", NA, NA, NA,
-                    "This describes the simulation time interval between save events."),
-    defineParameter("z_search", "numeric", NA, 0, 5,
-                    "range of depths the ALT_solver in meters. Increasing this number will increase processing time.
-                    may give erroneous permafrost presence for depths > 5m"),
     defineParameter("grid_ppp", "numeric", 25, NA, NA, "grid points per period. Should sample often enough within each
                     sine wave to detect all temperature crossings. Increasing will increase processing time, decreasing
                     may miss crossing"),
     defineParameter("overresolve", "numeric", 1.2, NA, NA, "multiplier than increases the number of grid points beyond
                     the minimum required by grid_ppp. Increasing this value will increase processing time"),
-    defineParameter("tol", "numeric", 1e-10, NA ,NA, "number of decimal points for each root"),
-    defineParameter("verbose", "logical", FALSE, NA, NA, "If TRUE, gives diagnostice messages while the solver runs.
-                     Can be useful for development and debugging but increases processing time"),
     defineParameter("plot_check", "logical", FALSE, NA, NA, "If TRUE, produces a diagnostic plot showing the behavior
                     of the ALT_Solver function over the search range. Can be useful for validation and debugging
                     but increases processing time"),
+    defineParameter("tol", "numeric", 1e-10, NA ,NA, "number of decimal points for each root"),
+    defineParameter("verbose", "logical", FALSE, NA, NA, "If TRUE, gives diagnostice messages while the solver runs.
+                     Can be useful for development and debugging but increases processing time"),
+    defineParameter("z_search", "numeric", NA, 0, 5,
+                    "range of depths the ALT_solver in meters. Increasing this number will increase processing time.
+                    may give erroneous permafrost presence for depths > 5m"),
     ## .seed is optional: `list('init' = 123)` will `set.seed(123)` for the `init` event only.
     defineParameter(".seed", "list", list(), NA, NA,
                     "Named list of seeds to use for each event (names)."),
