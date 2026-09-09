@@ -154,6 +154,7 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
 Init <- function(sim) {
   # # ! ----- EDIT BELOW ----- ! #
   siteParameters = merge(siteInfo,gParameters, by="Peatland")  #### Coding blitz check... do these need to be sim$
+  #change to landcover instead of peatland
   
   months = data.table(month = 5:10)
   
