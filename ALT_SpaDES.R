@@ -85,15 +85,12 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
       scheduleEvent(sim, start(sim),
                     "ALT_SpaDES", "ALTcalc", eventPriority = 1)
       scheduleEvent(sim, start(sim),
-                    "ALT_SpaDES", "ALTfinal", eventPriority = 2) #these are given twice is that correct?
+                    "ALT_SpaDES", "ALTfinal", eventPriority = 2)
       if (!any(is.na(P(sim)$.plots))) {
         scheduleEvent(sim, start(sim),
-                      "ALT_SpaDES", "plots", eventPriority = 3) #this is given twice is that correct?
+                      "ALT_SpaDES", "plots", eventPriority = 3)
       }
       
-      #Are these necessary?
-      #sim <- scheduleEvent(sim, P(sim)$.plotInitialTime, "ALThickness", "plot")
-      #sim <- scheduleEvent(sim, P(sim)$.saveInitialTime, "ALThickness", "save")
     },
     plot = {
       # ! ----- EDIT BELOW ----- ! #
@@ -156,7 +153,7 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
 ### template initialization
 Init <- function(sim) {
   # # ! ----- EDIT BELOW ----- ! #
-  siteParameters = merge(siteInfo,gParameters, by="Peatland")
+  siteParameters = merge(siteInfo,gParameters, by="Peatland")  #### Coding blitz check... do these need to be sim$
   
   months = data.table(month = 5:10)
   
