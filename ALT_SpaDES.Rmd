@@ -43,6 +43,8 @@ download.file(url = "https://img.shields.io/badge/Made%20with-Markdown-1f425f.pn
 
 ## Module Overview
 
+Estimates active layer thickness
+
 ### Quick links
 
 -   [General functioning](#general-functioning)
@@ -57,7 +59,7 @@ download.file(url = "https://img.shields.io/badge/Made%20with-Markdown-1f425f.pn
 
 ### Module summary
 
-ALT_SpaDES module calculates active layer thickness using annual ground surface temperature, surface temperature amplitude, and 4 parameters calibrated based on land cover type. As the equation uses exponentials the annual ground surface temperature must be provided in KELVIN. The module runs the ALT Solver function monthly from May to October and summarizes the greatest depth where the ground remains greater than 0 during this period (i.e. the active layer thickness).
+ALT_SpaDES module calculates active layer thickness using annual ground surface temperature, surface temperature amplitude, and 4 parameters calibrated based on land cover type. As the equation uses exponentials the annual ground surface temperature must be provided in KELVIN. The module runs the ALT Solver function monthly from May to October and summarizes the greatest depth where the ground remains greater than 0 during this period (i.e. the active layer thickness). 
 
 ### Module inputs and parameters
 
@@ -78,9 +80,9 @@ Describe input data required by the module and how to obtain it (e.g., directly 
 
 Inputs 
 
-siteInfo -> Data table input with the site information. The columns of this data table are Site (the site names), Landcover, Year, Ts (the annual ground surface temperature in Kelvin), and A (the ground surface temperature amplitude, the difference between the monthly maximum and minimum ground surface temperature)
+siteInfo -> Data table input with the site information. The columns of this data table are Site (the site names), Landcover, Year, Ts (the annual ground surface temperature in Kelvin), and A (the ground surface temperature amplitude, the difference between the monthly maximum and minimum ground surface temperature). Sample data is provided to show module function but should be replaces with real data before use.
 
-gParameters -> Data table input with the parameters required in the ALT Solver. The columns of this data table are Landcover, d (damping depth), k (decay in annual temperature), b (the amplitude modifier), p (the period modifier). This input can be created using the GT_Calibration_SpaDES module if the parameters need to be calibrated for new environment and/or land cover types. 
+gParameters -> Data table input with the parameters required in the ALT Solver. The columns of this data table are Landcover, d (damping depth), k (decay in annual temperature), b (the amplitude modifier), p (the period modifier). This input can be created using the GT_Calibration_SpaDES module if the parameters need to be calibrated for new environment and/or land cover types. Currently the parameters provided in this data table have been calibrated for peatland land covers. 
 
 Table \@ref(tab:moduleInputs-ALT_SpaDES) shows the full list of module inputs.
 
