@@ -80,7 +80,7 @@ Describe input data required by the module and how to obtain it (e.g., directly 
 
 Inputs 
 
-siteInfo -> Data table input with the site information. The columns of this data table are Site (the site names), Landcover, Year, Ts (the annual ground surface temperature in Kelvin), and A (the ground surface temperature amplitude, the difference between the monthly maximum and minimum ground surface temperature). Sample data is provided to show module function but should be replaces with real data before use.
+siteInfo -> Data table input with the site information. The columns of this data table are Site (the site names), Landcover, Year, Ts (the annual ground surface temperature in Kelvin), and A (the ground surface temperature amplitude, the difference between the monthly maximum and minimum ground surface temperature). Sample data is provided to show module function but should be replaced with real data before use.
 
 gParameters -> Data table input with the parameters required in the ALT Solver. The columns of this data table are Landcover, d (damping depth), k (decay in annual temperature), b (the amplitude modifier), p (the period modifier). This input can be created using the GT_Calibration_SpaDES module if the parameters need to be calibrated for new environment and/or land cover types. Currently the parameters provided in this data table have been calibrated for peatland land covers. 
 
@@ -129,9 +129,9 @@ knitr::kable(df_outputs, caption = "List of (ref:ALT_SpaDES) outputs and their d
 
 ### Links to other modules
 
-The gParameters data table can be produced from the GT_Calibration_SpaDES module if parameters need to be calibrated for a new enivornment or landcover types. 
+The gParameters data table can be produced from the GT_Calibration_SpaDES module if parameters need to be calibrated for a new environment or land cover types. 
 
-The siteInfo data table can be produced from the ###### module if the users does not have measured ground surface temperature and amplitude. 
+The siteInfo data table can be produced from the GS_Temp_SpaDES module if the user does not have measured ground surface temperature and amplitude. 
 
 ### Getting help
 
