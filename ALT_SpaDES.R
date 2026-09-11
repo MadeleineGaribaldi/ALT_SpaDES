@@ -130,8 +130,8 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
       
       scheduleEvent(sim, time(sim) + 1,
                     "ALT_SpaDES", "plots", eventPriority = 3)
-    }
-    warning(noEventWarning(sim)) # do I need this?
+    },
+    warning(noEventWarning(sim)) # do I need this? This line seems to be causing issues when I try to install from Github
   )
   return(invisible(sim)) # do I need this?
 }
