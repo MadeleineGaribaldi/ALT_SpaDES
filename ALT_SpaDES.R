@@ -139,6 +139,7 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
 ### template initialization
 Init <- function(sim) {
   # # ! ----- EDIT BELOW ----- ! #
+  print("init")
   siteParameters = merge(sim$siteInfo,sim$gParameters, by="Landcover")  #### Coding blitz check... do these need to be sim$
   
   months = data.table(month = 5:10)
@@ -154,6 +155,7 @@ Init <- function(sim) {
 ### template for your event1
 ALTestimation <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
+  print("ALT_EST")
   ALTparameters2 <- copy(mod$ALTparameters)
   ALTparameters2[
     ,
@@ -178,6 +180,7 @@ ALTestimation <- function(sim) {
 ### template for your event2
 ALTmaximum <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
+  print("ALT_Max")
   print(names(sim))
     ALTparameters2 <- copy(mod$ALTparameters)
     ALTmaximum <- function(sim) {
