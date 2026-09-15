@@ -190,10 +190,10 @@ ALTmaximum <- function(sim) {
         ,
         .SD[which.max(ALT)],
         by = .(Year, Site)
-      ][
-        ,
-        .(Site, Year, ALT)
-      ]
+      ]#[
+        #,
+       # .(Site, Year, ALT)
+     # ]
     }
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
