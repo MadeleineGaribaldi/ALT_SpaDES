@@ -182,7 +182,7 @@ ALTmaximum <- function(sim) {
     ALTfinal <- ALTparameters2[,.SD[which.max(ALT)],
       by = .(Year, Site)
     ]
-    ALTfinal <- ALTparameters2$ALT
+    ALTfinal <- ALTfinal$ALT
     
     sim$ALTfinal <- ALTfinal
 
