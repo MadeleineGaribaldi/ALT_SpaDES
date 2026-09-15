@@ -178,13 +178,12 @@ ALTestimation <- function(sim) {
 ### template for your event2
 ALTmaximum <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
-  print("Inside ALTmaximum")
   print(names(sim))
     ALTparameters2 <- copy(mod$ALTparameters)
     sim$ALTfinal <- ALTparameters2[,.SD[which.max(ALT)],
       by = .(Year, Site)
     ]
-    sim$ALTfinal <- ALTfinal$ALT
+    sim$ALTfinal <- ALTfinal[, .(Site, Year, ALT)]
     
    
 
