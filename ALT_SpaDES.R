@@ -82,9 +82,9 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
       # do stuff for this event
 
       # schedule future event(s)
-      scheduleEvent(sim, start(sim),
+      sim <- scheduleEvent(sim, start(sim),
                     "ALT_SpaDES", "ALTcalc", eventPriority = 1)
-      scheduleEvent(sim, start(sim),
+      sim <- scheduleEvent(sim, start(sim),
                     "ALT_SpaDES", "ALTfinal", eventPriority = 2)
       if (!any(is.na(P(sim)$.plots))) {
         scheduleEvent(sim, start(sim),
