@@ -180,13 +180,17 @@ ALTmaximum <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
   print(names(sim))
     ALTparameters2 <- copy(mod$ALTparameters)
-    sim$ALTfinal <- ALTparameters2[,.SD[which.max(ALT)],
-      by = .(Year, Site)
-    ]
-    sim$ALTfinal <- ALTfinal[, .(Site, Year, ALT)]
-    
-   
-
+    ALTmaximum <- function(sim) {
+      ALTparameters2 <- copy(mod$ALTparameters)
+      sim$ALTfinal <- ALTparameters2[
+        ,
+        .SD[which.max(ALT)],
+        by = .(Year, Site)
+      ][
+        ,
+        .(Site, Year, ALT)
+      ]
+    }
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
 }
