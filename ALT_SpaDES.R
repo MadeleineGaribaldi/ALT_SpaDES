@@ -21,7 +21,7 @@ defineModule(sim, list(
   parameters = bindrows(
     #defineParameter("paramName", "paramClass", value, min, max, "parameter description"),
     defineParameter(".plots", "character", "screen", NA, NA,
-                    "Used by Plots function, which can be optionally used here"),
+                    "Used by Plots function, which can be optionally used here"), #use interally
     defineParameter(".plotInitialTime", "numeric", start(sim), NA, NA,
                     "Describes the simulation time at which the first plot event should occur."),
     defineParameter(".plotInterval", "numeric", NA, NA, NA,
@@ -139,7 +139,7 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
 ### template initialization
 Init <- function(sim) {
   # # ! ----- EDIT BELOW ----- ! #
-  siteParameters = merge(siteInfo,gParameters, by="Landcover")  #### Coding blitz check... do these need to be sim$
+  siteParameters = merge(sim$siteInfo,sim$gParameters, by="Landcover")  #### Coding blitz check... do these need to be sim$
   
   months = data.table(month = 5:10)
   
@@ -159,7 +159,13 @@ ALTestimation <- function(sim) {
     ,
     ALT := pmap_dbl(
       list(Ts, A, month, p, k, d, b),
-      ALT_Solver_dataT
+      ALT_Solver_dataT,
+      grid_ppp = P(sim)$grid_ppp,
+      overresolve = P(sim)$overresolve,
+      plot_check = P(sim)$plot_check,
+      tol = P(sim)$tol,
+      verbose = P(sim)$verbose,
+      z_search = P(sim)$Z_search
     )
   ]
   ALTparameters2 <- ALTparameters2[!is.na(roots)]
