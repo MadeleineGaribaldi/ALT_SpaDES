@@ -181,20 +181,16 @@ ALTestimation <- function(sim) {
 ### template for your event2
 ALTmaximum <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
-  print("ALT_Max")
-  print(names(sim))
+    print("ALT_Max")
     ALTparameters2 <- copy(mod$ALTparameters)
-    ALTmaximum <- function(sim) {
-      ALTparameters2 <- copy(mod$ALTparameters)
-      sim$ALTfinal <- ALTparameters2[
-        ,
-        .SD[which.max(ALT)],
-        by = .(Year, Site)
-      ]#[
-        #,
-       # .(Site, Year, ALT)
-     # ]
-    }
+    sim$ALTfinal <- ALTparameters2[
+      ,
+      .SD[which.max(ALT)],
+      by = .(Year, Site)
+    ][
+      ,
+      .(Site, Year, ALT)
+    ]
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
 }
