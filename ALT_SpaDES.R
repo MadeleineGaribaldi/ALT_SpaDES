@@ -191,6 +191,11 @@ ALTmaximum <- function(sim) {
       ,
       .(Site, Year, ALT)
     ]
+    
+    fwrite(
+      sim$ALTfinal,
+      file.path(outputPath(sim), "ALTfinal.csv")
+    )
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
 }
