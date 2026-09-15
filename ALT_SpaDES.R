@@ -172,6 +172,7 @@ ALTestimation <- function(sim) {
   ]
   ALTparameters2 <- ALTparameters2[!is.na(ALT)]
   mod$ALTparameters <- ALTparameters2
+  print("leaving")
 
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
