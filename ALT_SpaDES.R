@@ -230,15 +230,10 @@ plotFun <- function(sim) {
 
   # ! ----- EDIT BELOW ----- ! #
   if(!suppliedElsewhere("siteInfo", sim)){
-    sim$siteInfo <- prepInputs(url = extractURL("siteInfo"),
-                           dpath)
-    Cache(userTags = cacheTags)
+    sim$siteInfo <- fread(file.path(paths(sim)$modulePath, currentModule(sim), "data", "Temp_Obs.csv"))
   }
-  
   if(!suppliedElsewhere("gParameters", sim)){
-    sim$gParameters <- prepInputs(url = extractURL("gParameters"),
-                              dpath)
-    Cache(userTags = cacheTags)
+    sim$gParameters <- fread(file.path(paths(sim)$modulePath, currentModule(sim), "data", "Temp_Obs.csv"))
   }
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
