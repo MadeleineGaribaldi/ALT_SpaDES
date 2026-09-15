@@ -165,7 +165,7 @@ ALTestimation <- function(sim) {
       plot_check = P(sim)$plot_check,
       tol = P(sim)$tol,
       verbose = P(sim)$verbose,
-      z_search = P(sim)$Z_search
+      z_search = P(sim)$z_search
     )
   ]
   ALTparameters2 <- ALTparameters2[!is.na(roots)]
@@ -176,13 +176,13 @@ ALTestimation <- function(sim) {
 }
 
 ### template for your event2
-ALTmaxiumum <- function(sim) {
+ALTmaximum <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
     ALTparameters2 <- copy(mod$ALTparameters)
     ALTfinal <- ALTparameters2[,.SD[which.max(ALT)],
       by = .(Year, Site)
     ]
-    ALTfinal <- ALTparameters2$maxALT
+    ALTfinal <- ALTparameters2$ALT
     
     sim$ALTfinal <- ALTfinal
 
