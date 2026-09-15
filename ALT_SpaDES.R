@@ -168,7 +168,7 @@ ALTestimation <- function(sim) {
       z_search = P(sim)$z_search
     )
   ]
-  ALTparameters2 <- ALTparameters2[!is.na(roots)]
+  ALTparameters2 <- ALTparameters2[!is.na(ALT)]
   mod$ALTparameters <- ALTparameters2
 
   # ! ----- STOP EDITING ----- ! #
