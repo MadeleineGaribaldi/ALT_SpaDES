@@ -37,7 +37,7 @@ defineModule(sim, list(
     defineParameter("tol", "numeric", 1e-10, NA ,NA, "number of decimal points for each root"),
     defineParameter("verbose", "logical", FALSE, NA, NA, "If TRUE, gives diagnostice messages while the solver runs.
                      Can be useful for development and debugging but increases processing time"),
-    defineParameter("z_search", "numeric", NA, 0, 5,
+    defineParameter("z_search", "numeric", c(0,5), NA, NA,
                     "range of depths the ALT_solver in meters. Increasing this number will increase processing time.
                     may give erroneous permafrost presence for depths > 5m"),
     ## .seed is optional: `list('init' = 123)` will `set.seed(123)` for the `init` event only.
