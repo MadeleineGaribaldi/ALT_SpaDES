@@ -113,9 +113,23 @@ ALT_Solver <- function(Ts, A, month, p,
     if (verbose) message(sprintf("No sign change detected. f(zmin)=%.6g, f(zmax)=%.6g", f_left, f_right))
     if (f_left < 0 && f_right < 0) {
       if (verbose) message("Inequality holds over the entire search interval.")
-      if (plot_check) plot_solver_view(f, z_search, roots = NULL,
-                                       sat_intervals = matrix(z_search, ncol = 2, byrow = TRUE),
-                                       title = "f(z) < 0 across entire range")
+      if (plot_check) {
+        message("About to plot")
+        
+        plot_solver_view(
+          f,
+          z_search,
+          roots = roots,
+          sat_intervals = intervals_mat
+        )
+        
+        message("Finished plotting")
+      }
+      
+      
+      #if (plot_check) plot_solver_view(f, z_search, roots = NULL,
+                                       #sat_intervals = matrix(z_search, ncol = 2, byrow = TRUE),
+                                       #title = "f(z) < 0 across entire range")
       return(list(intervals = matrix(z_search, ncol = 2, byrow = TRUE),
                   roots = numeric(0),
                   grid = list(z = br$z_grid, f = br$f_vals)))
