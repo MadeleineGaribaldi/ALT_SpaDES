@@ -181,7 +181,7 @@ ALT_Solver_dataT <- function(
     Ts, A, month, p, k, d, b,
     ...
 ) {
-  
+  message("Entered ALT_Solver_dataT")
   r <- ALT_Solver(
     Ts, A, month, p, k, d, b,
     ...
