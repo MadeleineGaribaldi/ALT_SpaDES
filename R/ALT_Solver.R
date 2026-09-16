@@ -67,15 +67,7 @@ ALT_Solver <- function(Ts, A, month, p,
                        overresolve = 1.2,      # multiplier to densify the grid
                        tol = 1e-10,
                        verbose = FALSE,
-                       plot_check = TRUE) {
-  
-  message("ALT_Solver plot_check = ", plot_check)
-  if (plot_check) {
-    message("Current device = ", dev.cur())
-  }
-  
-  message(names(dev.cur()))
-  print(dev.list())
+                       plot_check = FALSE) {
   
   stopifnot(length(z_search) == 2, z_search[1] < z_search[2])
   
@@ -113,35 +105,22 @@ ALT_Solver <- function(Ts, A, month, p,
     if (verbose) message(sprintf("No sign change detected. f(zmin)=%.6g, f(zmax)=%.6g", f_left, f_right))
     if (f_left < 0 && f_right < 0) {
       if (verbose) message("Inequality holds over the entire search interval.")
-      if (plot_check) {
-        message("About to plot")
-        
-        plot_solver_view(
-          f,
-          z_search,
-          roots = roots,
-          sat_intervals = intervals_mat
-        )
-        
-        message("Finished plotting")
-      }
       
-      
-      #if (plot_check) plot_solver_view(f, z_search, roots = NULL,
-                                       #sat_intervals = matrix(z_search, ncol = 2, byrow = TRUE),
-                                       #title = "f(z) < 0 across entire range")
+      if (plot_check) plot_solver_view(f, z_search, roots = NULL,
+                                       sat_intervals = matrix(z_search, ncol = 2, byrow = TRUE),
+                                       title = "f(z) < 0 across entire range")
       return(list(intervals = matrix(z_search, ncol = 2, byrow = TRUE),
                   roots = numeric(0),
                   grid = list(z = br$z_grid, f = br$f_vals)))
     } else {
       if (verbose) message("Inequality not satisfied on the search interval (with current grid).")
-      if (plot_check) message("About to plot")
-        plot_solver_view(f, z_search, roots = NULL, sat_intervals = NULL,
+      if (plot_check) {plot_solver_view(f, z_search, roots = NULL, sat_intervals = NULL,
                                        title = "No sign change detected")
-        message("Finished plotting")
+      }
         return(list(intervals = matrix(numeric(0), ncol = 2),
                   roots = numeric(0),
                   grid = list(z = br$z_grid, f = br$f_vals)))
+    
     }
   }
   
@@ -166,10 +145,9 @@ ALT_Solver <- function(Ts, A, month, p,
   
   if (length(sat) == 0) {
     if (verbose) message("No sub-intervals where f(z) < 0 (with current grid).")
-    if (plot_check) 
-      message("About to plot")
+    if (plot_check){
       plot_solver_view(f, z_search, roots = roots, sat_intervals = NULL)
-      message("Finished plotting")
+    }
     return(list(intervals = matrix(numeric(0), ncol = 2),
                 roots = roots,
                 grid = list(z = br$z_grid, f = br$f_vals)))
@@ -184,16 +162,10 @@ ALT_Solver <- function(Ts, A, month, p,
       message(sprintf("  z in [%.6g, %.6g]", r[1], r[2])))
   }
   
-  if (plot_check) {
-    message("plot_check reached")
-    message("Current device: ", dev.cur())
-  }
   
   if (plot_check) {
-    message("About to plot")
     plot_solver_view(f, z_search, roots = roots, sat_intervals = intervals_mat)
   }
-  message("Finished plotting")
   list(intervals = intervals_mat,
        roots = roots,
        grid = list(z = br$z_grid, f = br$f_vals),
@@ -204,7 +176,6 @@ ALT_Solver_dataT <- function(
     Ts, A, month, p, k, d, b,
     ...
 ) {
-  message("Entered ALT_Solver_dataT")
   r <- ALT_Solver(
     Ts, A, month, p, k, d, b,
     ...
