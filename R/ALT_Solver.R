@@ -182,7 +182,8 @@ ALT_Solver_dataT <- function(
   )$roots
   
   if (length(r) == 0) NA_real_ else min(r)
-  
+  message("plot_check in wrapper = ",
+          dots$plot_check)
 }
 
 
