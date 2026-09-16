@@ -74,6 +74,9 @@ ALT_Solver <- function(Ts, A, month, p,
     message("Current device = ", dev.cur())
   }
   
+  message(names(dev.cur()))
+  print(dev.list())
+  
   stopifnot(length(z_search) == 2, z_search[1] < z_search[2])
   
   # Define f(z)
