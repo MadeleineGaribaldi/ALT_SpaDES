@@ -67,7 +67,7 @@ ALT_Solver <- function(Ts, A, month, p,
                        overresolve = 1.2,      # multiplier to densify the grid
                        tol = 1e-10,
                        verbose = FALSE,
-                       plot_check = FALSE) {
+                       plot_check = TRUE) {
   stopifnot(length(z_search) == 2, z_search[1] < z_search[2])
   
   # Define f(z)
@@ -157,6 +157,11 @@ ALT_Solver <- function(Ts, A, month, p,
   }
   
   if (plot_check) {
+    message("plot_check reached")
+    message("Current device: ", dev.cur())
+  }
+  
+  if (plot_check) {
     plot_solver_view(f, z_search, roots = roots, sat_intervals = intervals_mat)
   }
   
@@ -177,6 +182,9 @@ ALT_Solver_dataT <- function(
   )$roots
   
   if (length(r) == 0) NA_real_ else min(r)
+  
 }
+
+
 
 
