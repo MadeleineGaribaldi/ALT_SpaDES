@@ -135,9 +135,11 @@ ALT_Solver <- function(Ts, A, month, p,
                   grid = list(z = br$z_grid, f = br$f_vals)))
     } else {
       if (verbose) message("Inequality not satisfied on the search interval (with current grid).")
-      if (plot_check) plot_solver_view(f, z_search, roots = NULL, sat_intervals = NULL,
+      if (plot_check) message("About to plot")
+        plot_solver_view(f, z_search, roots = NULL, sat_intervals = NULL,
                                        title = "No sign change detected")
-      return(list(intervals = matrix(numeric(0), ncol = 2),
+        message("Finished plotting")
+        return(list(intervals = matrix(numeric(0), ncol = 2),
                   roots = numeric(0),
                   grid = list(z = br$z_grid, f = br$f_vals)))
     }
@@ -164,7 +166,10 @@ ALT_Solver <- function(Ts, A, month, p,
   
   if (length(sat) == 0) {
     if (verbose) message("No sub-intervals where f(z) < 0 (with current grid).")
-    if (plot_check) plot_solver_view(f, z_search, roots = roots, sat_intervals = NULL)
+    if (plot_check) 
+      message("About to plot")
+      plot_solver_view(f, z_search, roots = roots, sat_intervals = NULL)
+      message("Finished plotting")
     return(list(intervals = matrix(numeric(0), ncol = 2),
                 roots = roots,
                 grid = list(z = br$z_grid, f = br$f_vals)))
@@ -185,9 +190,10 @@ ALT_Solver <- function(Ts, A, month, p,
   }
   
   if (plot_check) {
+    message("About to plot")
     plot_solver_view(f, z_search, roots = roots, sat_intervals = intervals_mat)
   }
-  
+  message("Finished plotting")
   list(intervals = intervals_mat,
        roots = roots,
        grid = list(z = br$z_grid, f = br$f_vals),
