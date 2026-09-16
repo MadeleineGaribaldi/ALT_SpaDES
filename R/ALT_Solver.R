@@ -68,6 +68,12 @@ ALT_Solver <- function(Ts, A, month, p,
                        tol = 1e-10,
                        verbose = FALSE,
                        plot_check = TRUE) {
+  
+  message("ALT_Solver plot_check = ", plot_check)
+  if (plot_check) {
+    message("Current device = ", dev.cur())
+  }
+  
   stopifnot(length(z_search) == 2, z_search[1] < z_search[2])
   
   # Define f(z)
