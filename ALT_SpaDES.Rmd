@@ -59,12 +59,14 @@ Estimates active layer thickness
 
 ### Module summary
 
-ALT_SpaDES module calculates active layer thickness using annual ground surface temperature, surface temperature amplitude, and 4 parameters calibrated based on land cover type. As the equation uses exponentials the annual ground surface temperature must be provided in KELVIN. The module runs the ALT Solver function monthly from May to October and summarizes the greatest depth where the ground remains greater than 0 during this period (i.e. the active layer thickness). 
+ALT_SpaDES module calculates active layer thickness using annual ground surface temperature, surface temperature amplitude, and 4 parameters calibrated based on land cover type. As the equation uses exponentials the annual ground surface temperature (Ts) must be provided in KELVIN. The module runs the ALT Solver function monthly (from May to October as a default) and summarizes the greatest depth where the ground remains greater than 0 during this period (i.e. the active layer thickness). 
 
 ### Module inputs and parameters
 
 Parameters
 grid_ppp -> sets the number of grid points per period. This determines how often the function is sampled within each sine wave. Increasing this value will ensure all crossings of f(z) = 0 but can increase processing time. If this value is decreased processing time will increase but crossings may be missed.
+
+months -> sets the months for which the ALT Solver is run and for which roots (i.e. active layer thicknesses) are calculated. These months should correspond to the timing of maximum thaw in order to accurately predict active layer thickness. The default is May (5) to October (10). Increasing the number of months will increase processing time.
 
 overresolve -> multiplier than increases the number of grid points beyond the minimum assigned by grid_ppp. 
 
@@ -113,7 +115,7 @@ ALTfinal -> This event calculate the final active layer thickness for each site 
 
 ### Plotting
 
-Write what is plotted.
+Plotting is controlled through the plot_check parameter not .plot for this module. Changing plot_check from the default (FALSE) to TRUE will result in plotting for monthly roots indicating the transition from thawed to frozen (f(z)<0). These plots can be used to assess proper module function but will increasing processing time. Therefore it is recommended to leave plot_check as the default unless the user is validating module validity. Plots through this module can only be produced in the screen.
 
 ### Module outputs
 
