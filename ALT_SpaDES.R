@@ -29,6 +29,9 @@ defineModule(sim, list(
     defineParameter("grid_ppp", "numeric", 25, NA, NA, "grid points per period. Should sample often enough within each
                     sine wave to detect all temperature crossings. Increasing will increase processing time, decreasing
                     may miss crossing"),
+    defineParameter("months", "numeric", c(5,10), NA, NA, "months used to determine ALT. Depending on the
+                    number of points as smaller range of months will decrease processing time. ALT is typically found during
+                    late summer, so the months selected should reflect these conditions"),
     defineParameter("overresolve", "numeric", 1.2, NA, NA, "multiplier than increases the number of grid points beyond
                     the minimum required by grid_ppp. Increasing this value will increase processing time"),
     defineParameter("plot_check", "logical", FALSE, NA, NA, "If TRUE, produces a diagnostic plot showing the behavior
@@ -141,7 +144,10 @@ Init <- function(sim) {
   # # ! ----- EDIT BELOW ----- ! #
   siteParameters = merge(sim$siteInfo,sim$gParameters, by="Landcover")  #### Coding blitz check... do these need to be sim$
   
-  months = data.table(month = 5:10)
+  months <- data.table(
+    month = P(sim)$monthsP:(sim)$months[2]
+  )
+  
   
   ALTparameters <- data.table(NULL)
   ALTparameters <- cross_join(siteParameters, months)
