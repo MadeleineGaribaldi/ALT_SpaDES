@@ -142,6 +142,41 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
 ### template initialization
 Init <- function(sim) {
   # # ! ----- EDIT BELOW ----- ! #
+  requiredColssiteInfo <- c("Site","Landcover","Year","Ts","A")
+  missingColssiteInfo <- setdiff(requiredColssiteInfo, names(sim$siteInfo))
+  
+  if (length(missingColssiteInfo) > 0) {
+    stop(
+      paste0(
+        "siteInfo is missing required column(s): ",
+        paste(missingColssiteInfo, collapse = ", "),
+        "\nColumns found: ",
+        paste(names(sim$siteInfo), collapse = ", ")
+      )
+    )
+  }
+  if (any(sim$siteInfo$Ts < 100, na.rm = TRUE)) {
+    stop(
+      paste0(
+        "Invalid values found in siteInfo$Ts.Must be in Kelvin ",
+      )
+    )
+  }
+  
+  requiredColsgParameters <- c("Landcover","d","k","b","p")
+  missingColsgParameters <- setdiff(requiredColsgParameters, names(sim$gParameters))
+  
+  if (length(missingColsgParameters) > 0) {
+    stop(
+      paste0(
+        "gParameters is missing required column(s): ",
+        paste(missingsColsgParameters, collapse = ", "),
+        "\nColumns found: ",
+        paste(names(sim$gParameters), collapse = ", ")
+      )
+    )
+  }
+  
   siteParameters = merge(sim$siteInfo,sim$gParameters, by="Landcover")  #### Coding blitz check... do these need to be sim$
   
   months <- data.table(
