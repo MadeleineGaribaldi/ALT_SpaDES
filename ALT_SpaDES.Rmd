@@ -76,7 +76,7 @@ tol -> tolerance which sets the numerical accuracy (number of decimal points) re
 
 verbose -> default is FALSE. If set to TRUE the module will give diagnostic messages while the solver runs. This can be useful for validation and debugging, but can increase processing time. 
 
-z_search -> range of depths (z) for the ALT Solver. Default is 0-5m. The module will produce results up to the maximum provided. This can lead to erroneous prediction of active layer thickness where no permafrost is present. The ALT Solver has only been validated up to 3m, therefore running the module for depths much greater than 3m may produce inaccurate results. It is recommended to limit the model run to within typical active layer thicknesses (< 5m).
+z_search -> range of depths (z) in meters for the ALT Solver. Default is 0-5m. The module will produce results up to the maximum provided. This can lead to erroneous prediction of active layer thickness where no permafrost is present. The ALT Solver has only been validated up to 3m, therefore running the module for depths much greater than 3m may produce inaccurate results. It is recommended to limit the model run to within typical active layer thicknesses (< 5m).
 
 Describe input data required by the module and how to obtain it (e.g., directly from online sources or supplied by other modules) If `sourceURL` is specified, `downloadData("ALT_SpaDES", "C:/Users/mgaribal/Documents/test/modules")` may be sufficient.
 
@@ -111,7 +111,7 @@ Init -> This event sets up a data table to avoid a loop within the ALT Solver. F
 
 ALTcalc -> This event runs the ALT Solver function for each row in the ALTparameters data table and saves each root (crossing of f(z) = 0)
 
-ALTfinal -> This event calculate the final active layer thickness for each site and year provided in the siteInfo data table. The active layer thickness is the maximum root depth (greatest z where f(z) crosses 0) for each individual year and site
+ALTfinal -> This event calculates the final active layer thickness for each site and year provided in the siteInfo data table. The active layer thickness is the maximum root depth (greatest z where f(z) crosses 0) for each individual year and site
 
 ### Plotting
 
