@@ -26,23 +26,34 @@ defineModule(sim, list(
                     "Describes the simulation time at which the first plot event should occur."),
     defineParameter(".plotInterval", "numeric", NA, NA, NA,
                     "Describes the simulation time interval between plot events."),
-    defineParameter("grid_ppp", "numeric", 25, NA, NA, "grid points per period. Should sample often enough within each
-                    sine wave to detect all temperature crossings. Increasing will increase processing time, decreasing
-                    may miss crossing"),
-    defineParameter("months", "numeric", c(5,10), NA, NA, "months used to determine ALT. Depending on the
-                    number of points as smaller range of months will decrease processing time. ALT is typically found during
-                    late summer, so the months selected should reflect these conditions"),
+    defineParameter("grid_ppp", "numeric", 25, NA, NA, "Sets the number of grid points per period. This determines 
+                    how often the function is sampled within each sine wave. Increasing this value will ensure 
+                    all crossings of temperature = 0 but can increase processing time. If this value is decreased 
+                    processing time will increase but crossings may be missed."),
+    defineParameter("months", "numeric", c(5,10), NA, NA, "sets the months for which the ALT Solver is run and for
+                    which roots (i.e. active layer thicknesses) are calculated. These months should correspond to 
+                    the timing of maximum thaw in order to accurately predict active layer thickness. The default 
+                    is May (5) to October (10). Increasing the number of months will increase processing time."),
     defineParameter("overresolve", "numeric", 1.2, NA, NA, "multiplier than increases the number of grid points beyond
                     the minimum required by grid_ppp. Increasing this value will increase processing time"),
-    defineParameter("plot_check", "logical", FALSE, NA, NA, "If TRUE, produces a diagnostic plot showing the behavior
-                    of the ALT_Solver function over the search range. Can be useful for validation and debugging
-                    but increases processing time"),
-    defineParameter("tol", "numeric", 1e-10, NA ,NA, "number of decimal points for each root"),
+    defineParameter("plot_check", "logical", FALSE, NA, NA, "This replaces the .plot parameter for this module. 
+                    The Default is FALSE. If set to TRUE module will create a diagnostic plot for each month showing 
+                    the behavior of the ALT Solver Function and can indicate the solver is saving the correct z for each 
+                    month. This can be used for validation and debugging, however it greatly increases the processing 
+                    time. Plots can only be save to the screen."),
+    defineParameter("tol", "numeric", 1e-10, NA ,NA, "tolerance which sets the numerical accuracy (number of decimal 
+                    points) reported for the active layer thickness"),
     defineParameter("verbose", "logical", FALSE, NA, NA, "If TRUE, gives diagnostice messages while the solver runs.
-                     Can be useful for development and debugging but increases processing time"),
+                     Can be useful for development and debugging but increases processing time. The default is FALSE."),
     defineParameter("z_search", "numeric", c(0,5), NA, NA,
-                    "range of depths the ALT_solver in meters. Increasing this number will increase processing time.
-                    may give erroneous permafrost presence for depths > 5m"),
+                    "Range of depths (z) in meters for the ALT Solver. Default is 0-5m. The module will produce 
+                    results up to the maximum provided. This can lead to erroneous prediction of active layer 
+                    thickness where no permafrost is present. As the parameters depend on calibration data it is 
+                    recommended to keep the maximum for z_search within the calibration depth range. The default 
+                    parameter values provided in the gParameters input were calibrated and validated for depths up 
+                    to 3m therefore running the module for depths much greater than 3m may produce inaccurate results. 
+                    It is recommended to limit the model run to within typical active layer thicknesses (< 5m) as 
+                    the model may still produces an ALT value which exceed any known ALT."),
     ## .seed is optional: `list('init' = 123)` will `set.seed(123)` for the `init` event only.
     defineParameter(".seed", "list", list(), NA, NA,
                     "Named list of seeds to use for each event (names)."),
@@ -65,7 +76,12 @@ defineModule(sim, list(
   ),
   inputObjects = bindrows(
     #expectsInput("objectName", "objectClass", "input object description", sourceURL, ...),
-    expectsInput("gParameters", objectClass = "data.table", desc = "Calibrated model parameters based on landcover type", "sourceURL = https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON"),
+    expectsInput("gParameters", objectClass = "data.table", desc = "Data table input with the site information. 
+                 The columns of this data table are Site (the site names), Class, Year, Ts 
+                 (the annual ground surface temperature in Kelvin), and A 
+                 (the ground surface temperature amplitude, the difference between the monthly maximum 
+                 and minimum ground surface temperature). Sample data is provided to show module function but 
+                 should be replaced with real data before use."),
     expectsInput("siteInfo", objectClass = "data.table", desc = "Annual model variables including year, surface temperature, temperature amplitude, and site information", "sourceURL = https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON")
   ),
   outputObjects = bindrows(
@@ -142,7 +158,7 @@ doEvent.ALT_SpaDES = function(sim, eventTime, eventType) {
 ### template initialization
 Init <- function(sim) {
   # # ! ----- EDIT BELOW ----- ! #
-  requiredColssiteInfo <- c("Site","Landcover","Year","Ts","A")
+  requiredColssiteInfo <- c("Site","Class","Year","Ts","A")
   missingColssiteInfo <- setdiff(requiredColssiteInfo, names(sim$siteInfo))
   
   if (length(missingColssiteInfo) > 0) {
@@ -163,7 +179,7 @@ Init <- function(sim) {
     )
   }
   
-  requiredColsgParameters <- c("Landcover","d","k","b","p")
+  requiredColsgParameters <- c("Class","d","k","b","p")
   missingColsgParameters <- setdiff(requiredColsgParameters, names(sim$gParameters))
   
   if (length(missingColsgParameters) > 0) {
@@ -177,7 +193,7 @@ Init <- function(sim) {
     )
   }
   
-  siteParameters = merge(sim$siteInfo,sim$gParameters, by="Landcover")  #### Coding blitz check... do these need to be sim$
+  siteParameters = merge(sim$siteInfo,sim$gParameters, by="Class")
   
   months <- data.table(
     month = P(sim)$monthsP:(sim)$months[2]
@@ -209,7 +225,6 @@ ALTestimation <- function(sim) {
       z_search = P(sim)$z_search
     )
   ]
-  ALTparameters2 <- ALTparameters2[!is.na(ALT)]
   mod$ALTparameters <- ALTparameters2
 
   # ! ----- STOP EDITING ----- ! #
@@ -222,11 +237,16 @@ ALTmaximum <- function(sim) {
     ALTparameters2 <- copy(mod$ALTparameters)
     sim$ALTfinal <- ALTparameters2[
       ,
-      .SD[which.max(ALT)],
+      if (all(is.na(ALT))) {
+        if (any(month == 9)) {
+          .SD[month == 9]
+        } else {
+          .SD[1]
+        }
+      } else {
+        .SD[which.max(replace(ALT, is.na(ALT), -Inf))]
+      },
       by = .(Year, Site)
-    ][
-      ,
-      .(Site, Year, ALT)
     ]
     
     fwrite(
