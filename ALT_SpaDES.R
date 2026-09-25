@@ -196,7 +196,7 @@ Init <- function(sim) {
   siteParameters = merge(sim$siteInfo,sim$gParameters, by="Class")
   
   months <- data.table(
-    month = P(sim)$monthsP:(sim)$months[2]
+    month = P(sim)$months:(sim)$months[2]
   )
   
   
