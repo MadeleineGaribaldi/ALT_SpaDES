@@ -195,8 +195,12 @@ Init <- function(sim) {
   
   siteParameters = merge(sim$siteInfo,sim$gParameters, by="Class")
   
+  if (length(P(sim)$months) != 2) {
+    stop("'months' must contain exactly two values: c(minMonth, maxMonth)")
+  }
+  
   months <- data.table(
-    month = P(sim)$months:P(sim)$months[2]
+    month = seq(P(sim)$months[1], P(sim)$months[2])
   )
   
   
