@@ -21,7 +21,7 @@ always_allow_html: true
 
 <!-- the following are text references used in captions for LaTeX compatibility -->
 
-(ref:ALT_SpaDES) *ALT_SpaDES* #MG do include the other parameters here?
+(ref:ALT_SpaDES) *ALT_SpaDES*
 
 ```{r setup-ALT_SpaDES, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## change to eval = TRUE if all chunks are to be evaluated
@@ -43,7 +43,7 @@ download.file(url = "https://img.shields.io/badge/Made%20with-Markdown-1f425f.pn
 
 ## Module Overview
 
-Estimates active layer thickness (ALT) based on repeated iterations of a sine ground temperature function. ALT is the depth of the layer of substrate above permafrost that freezes and thaws each year. ALTs typically range from around 0.2 m to around 3 m. 
+Estimates active layer thickness (ALT) based on repeated iterations of a sine ground temperature function. ALT is the depth of the layer of substrate above permafrost that freezes and thaws each year. ALTs typically range from around 0.2 m to around 3 m.
 
 ### Quick links
 
@@ -59,67 +59,66 @@ Estimates active layer thickness (ALT) based on repeated iterations of a sine gr
 
 ### Module summary
 
-ALT_SpaDES module calculates active layer thickness using annual ground surface temperature, surface temperature amplitude, and 4 parameters calibrated based on a user decided class (i.e. substrate or landcover). As the equation uses exponentials the annual ground surface temperature (Ts) must be provided in KELVIN. The module runs the ALT Solver function monthly (from May to October as a default) and summarizes the greatest depth where the ground remains greater than 0 during this period (i.e. the active layer thickness). 
+ALT_SpaDES module calculates active layer thickness using annual ground surface temperature, surface temperature amplitude, and 4 parameters calibrated based on a user decided class (i.e. substrate or landcover). As the equation uses exponentials the annual ground surface temperature (Ts) must be provided in KELVIN. The module runs the ALT Solver function monthly (from May to October as a default) and summarizes the greatest depth where the ground remains greater than 0 during this period (i.e. the active layer thickness).
 
 ### Module inputs and parameters
 
-####Inputs 
-#####siteInfo
-The class column a user defined division based on what impacts the parameters d and k.
-gParameters -> Data table input with the parameters required in the ALT Solver. The columns of this data table are Landcover, d (damping depth), k (decay in annual temperature), b (the amplitude modifier), p (the period modifier). This input can be created using the GT_Calibration_SpaDES module if the parameters need to be calibrated for new environment and/or land cover types. Currently the parameters provided in this data table have been calibrated for peatland land covers. 
-
+#### Inputs
 
 Describe input data required by the module and how to obtain it (e.g., directly from online sources or supplied by other modules) If `sourceURL` is specified, `downloadData("ALT_SpaDES", "C:/Users/mgaribal/Documents/test/modules")` may be sufficient.
-
 
 Table \@ref(tab:moduleInputs-ALT_SpaDES) shows the full list of module inputs.
 
 ```{r moduleInputs-ALT_SpaDES, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-#Do I need to change the file path?
-df_inputs <- SpaDES.core::moduleInputs("ALT_SpaDES", "C:/Users/mgaribal/Documents/test/modules")
+df_inputs <- SpaDES.core::moduleInputs("ALT_SpaDES", "C:/Users/mgaribal/Documents/GitHub")
 knitr::kable(df_inputs,
              caption = "List of (ref:ALT_SpaDES) input objects and their description.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
-#Parameters
+
+####Parameters
+
 Summary of user-visible parameters (Table \@ref(tab:moduleParams-ALT_SpaDES))
 
 ```{r moduleParams-ALT_SpaDES, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-#change file path?
-df_params <- SpaDES.core::moduleParams("ALT_SpaDES", "C:/Users/mgaribal/Documents/test/modules")
+df_params <- SpaDES.core::moduleParams("ALT_SpaDES", "C:/Users/mgaribal/Documents/GitHub")
 knitr::kable(df_params, caption = "List of (ref:ALT_SpaDES) parameters and their description.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 
 ### Events
 
-Init -> This event sets up a data table to avoid a loop within the ALT Solver. First the two input data tables siteInfo and gParameters are combined based on land cover type into a siteParameters data table. It then creates a new data table of months (default 5-10). The new months data table and the siteParameters data table are combined to duplicate the rows of siteParameters for each month in the months data table and to create a new column months. This is done to avoid a loop within the ALT Solver. These changes are saved in a new data table called ALTparameters.
+#### Init
 
-ALTcalc -> This event runs the ALT Solver function for each row in the ALTparameters data table and saves the minumum depth (z) where temperature crosses 0. These are the monthly frost depths.
+This event sets up a data table to avoid a loop within the ALT Solver. First the two input data tables siteInfo and gParameters are combined based on land cover type into a siteParameters data table. It then creates a new data table of months (default 5-10). The new months data table and the siteParameters data table are combined to duplicate the rows of siteParameters for each month in the months data table and to create a new column months. This is done to avoid a loop within the ALT Solver. These changes are saved in a new data table called ALTparameters.
 
-ALTfinal -> This event calculates the final active layer thickness for each site and year provided in the siteInfo data table. The active layer thickness is the maximum depth (z) where temperature crosses 0 for each individual year and site (the maxiumum for each year and site saved in the ALTcalc event).
+#### ALTcalc
+
+This event runs the ALT Solver function for each row in the ALTparameters data table and saves the minimum depth (z) where temperature crosses 0. These are the monthly frost depths.
+
+#### ALTfinal
+
+This event calculates the final active layer thickness for each site and year provided in the siteInfo data table. The active layer thickness is the maximum depth (z) where temperature crosses 0 for each individual year and site (the maximum for each year and site saved in the ALTcalc event).
 
 ### Plotting
 
-Plotting is controlled through the plot_check parameter not .plot for this module. Changing plot_check from the default (FALSE) to TRUE will result in plotting for monthly roots indicating the transition from thawed to frozen (f(z)<0). These plots can be used to assess proper module function but will increasing processing time. Therefore it is recommended to leave plot_check as the default unless the user is validating module validity. Plots through this module can only be produced in the screen.
+Plotting is controlled through the plot_check parameter not .plot for this module. Changing plot_check from the default (FALSE) to TRUE will result in plotting for monthly roots indicating the transition from thawed to frozen (f(z)\<0). These plots can be used to assess proper module function but will increasing processing time. Therefore it is recommended to leave plot_check as the default unless the user is validating module validity. Plots through this module can only be produced in the screen.
 
 ### Module outputs
-
-ALTfinal -> Data table containing the final active layer thickness (in meters) for each site and year in the siteInfo data table input. 
 
 (Table \@ref(tab:moduleOutputs-ALT_SpaDES)).
 
 ```{r moduleOutputs-ALT_SpaDES, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-df_outputs <- SpaDES.core::moduleOutputs("ALT_SpaDES", "C:/Users/mgaribal/Documents/test/modules")
+df_outputs <- SpaDES.core::moduleOutputs("ALT_SpaDES", "C:/Users/mgaribal/Documents/GitHub")
 knitr::kable(df_outputs, caption = "List of (ref:ALT_SpaDES) outputs and their description.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 
 ### Links to other modules
 
-The gParameters data table can be produced from the GT_Calibration_SpaDES module if parameters need to be calibrated for a new environment or land cover types. 
+The gParameters data table can be produced from the GT_Calibration_SpaDES module if parameters need to be calibrated for a new environment or land cover types.
 
-The siteInfo data table can be produced from the GS_Temp_SpaDES module if the user does not have measured ground surface temperature and amplitude. 
+The siteInfo data table can be produced from the GS_Temp_SpaDES module if the user does not have measured ground surface temperature and amplitude.
 
 ### Getting help
 
@@ -128,3 +127,8 @@ The siteInfo data table can be produced from the GS_Temp_SpaDES module if the us
 ## References
 
 <!-- autogenerated from bibligraphy -->
+
+SpaDES.core::moduleMetadata(
+module = "ALT_SpaDES",
+path = "."
+)

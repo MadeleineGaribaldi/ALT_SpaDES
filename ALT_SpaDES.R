@@ -32,8 +32,10 @@ defineModule(sim, list(
                     processing time will increase but crossings may be missed."),
     defineParameter("months", "numeric", c(5,10), NA, NA, "sets the months for which the ALT Solver is run and for
                     which roots (i.e. active layer thicknesses) are calculated. These months should correspond to 
-                    the timing of maximum thaw in order to accurately predict active layer thickness. The default 
-                    is May (5) to October (10). Increasing the number of months will increase processing time."),
+                    the timing of maximum thaw in order to accurately predict active layer thickness. Running 
+                    for months where seasonal frost might be present may lead to errouneous estimations of ALT. 
+                    The default is May (5) to October (10). Increasing the number of months will 
+                    increase processing time."),
     defineParameter("overresolve", "numeric", 1.2, NA, NA, "multiplier than increases the number of grid points beyond
                     the minimum required by grid_ppp. Increasing this value will increase processing time"),
     defineParameter("plot_check", "logical", FALSE, NA, NA, "This replaces the .plot parameter for this module. 
@@ -76,17 +78,28 @@ defineModule(sim, list(
   ),
   inputObjects = bindrows(
     #expectsInput("objectName", "objectClass", "input object description", sourceURL, ...),
-    expectsInput("gParameters", objectClass = "data.table", desc = "Data table input with the site information. 
+    expectsInput("gParameters", objectClass = "data.table", desc = "Data table input with the parameters 
+                 required in the ALT Solver. The columns of this data table are Landcover, 
+                 d (damping depth), k (decay in annual temperature), b (the amplitude modifier), 
+                 p (the period modifier). This input can be created using the GT_Calibration_SpaDES 
+                 module if the parameters need to be calibrated for new environment and/or land cover types. 
+                 Currently the parameters provided in this data table have been calibrated for peatland land covers.",sourceURL = NA),
+    expectsInput("siteInfo", objectClass = "data.table", desc = "Data table input with the site information. 
                  The columns of this data table are Site (the site names), Class, Year, Ts 
                  (the annual ground surface temperature in Kelvin), and A 
                  (the ground surface temperature amplitude, the difference between the monthly maximum 
-                 and minimum ground surface temperature). Sample data is provided to show module function but 
-                 should be replaced with real data before use."),
-    expectsInput("siteInfo", objectClass = "data.table", desc = "Annual model variables including year, surface temperature, temperature amplitude, and site information", "sourceURL = https://drive.google.com/drive/folders/1_Wo6-2t-nHULE4kot4DUAWxg3e9fKWON")
+                 and minimum ground surface temperature). The class column a user defined division based on what 
+                 impacts the parameters d and k.Sample data is provided to show module function but 
+                 should be replaced with real data before use.This data table can be generated using the 
+                 GS_Temp_SpaDES module.", sourceURL = NA)
   ),
   outputObjects = bindrows(
     #createsOutput("objectName", "objectClass", "output object description", ...),
-    createsOutput("ALTfinal", objectClass = "data.table", desc = "Active layer thickness")
+    createsOutput("ALTfinal", objectClass = "data.table", desc = "Data table containing the final active layer 
+                  thickness (in meters) for each site and year in the siteInfo data table input. 
+                  For sites with no permafrost and no ALT the module will out put an NA or a blank cell 
+                  when converted to a .csv file. The month assigned to this value will be September (9). If September 
+                  is not used the month assigned will be the earliest.")
   )
 ))
 
