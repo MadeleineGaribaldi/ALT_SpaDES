@@ -186,7 +186,7 @@ Init <- function(sim) {
     stop(
       paste0(
         "gParameters is missing required column(s): ",
-        paste(missingsColsgParameters, collapse = ", "),
+        paste(missingColsgParameters, collapse = ", "),
         "\nColumns found: ",
         paste(names(sim$gParameters), collapse = ", ")
       )
@@ -196,7 +196,7 @@ Init <- function(sim) {
   siteParameters = merge(sim$siteInfo,sim$gParameters, by="Class")
   
   months <- data.table(
-    month = P(sim)$months:(sim)$months[2]
+    month = P(sim)$months:P(sim)$months[2]
   )
   
   
