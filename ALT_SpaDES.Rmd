@@ -59,7 +59,7 @@ Estimates active layer thickness (ALT) based on repeated iterations of a sine gr
 
 ### Module summary
 
-ALT_SpaDES module calculates active layer thickness using annual ground surface temperature, surface temperature amplitude, and 4 parameters calibrated based on a user decided class (i.e. substrate or landcover). As the equation uses exponentials the annual ground surface temperature (Ts) must be provided in KELVIN. The module runs the ALT Solver function monthly (from May to October as a default) and summarizes the greatest depth where the ground remains greater than 0 during this period (i.e. the active layer thickness).
+ALT_SpaDES module calculates active layer thickness using annual ground surface temperature, surface temperature amplitude, and 4 parameters calibrated based on a user decided class (i.e. substrate or land cover). As the equation uses exponentials the annual ground surface temperature (Ts) must be provided in KELVIN. The module runs the ALT Solver function monthly (from May to October as a default) and summarizes the greatest depth where the ground remains greater than 0 during this period (i.e. the active layer thickness). If no value is returned this means the module is predicted no near surface permafrost.
 
 ### Module inputs and parameters
 
@@ -98,7 +98,10 @@ This event runs the ALT Solver function for each row in the ALTparameters data t
 
 #### ALTfinal
 
-This event calculates the final active layer thickness for each site and year provided in the siteInfo data table. The active layer thickness is the maximum depth (z) where temperature crosses 0 for each individual year and site (the maximum for each year and site saved in the ALTcalc event).
+This event calculates the final active layer thickness for each site and year provided in the siteInfo data table. The active layer thickness is the maximum depth (z) where temperature crosses 0 for each individual year and site (the maximum for each year and site saved in the ALTcalc event). There are a couple special rules during this event to account for different ALT scenarios. 
+1. If an ALT is produced for all months (excluding some of the early spring months), the maximum is selected.
+2. If all months produce NA than the final value selected is NA
+3. If some months early in the thawing season produce an ALT, but the ALT for September (typically the peak thaw) is NA then NA is returned as the ALT value since the entire range of depths was unfrozen during the timing of peak thaw.
 
 ### Plotting
 

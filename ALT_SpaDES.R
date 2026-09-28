@@ -33,9 +33,10 @@ defineModule(sim, list(
     defineParameter("months", "numeric", c(5,10), NA, NA, "sets the months for which the ALT Solver is run and for
                     which roots (i.e. active layer thicknesses) are calculated. These months should correspond to 
                     the timing of maximum thaw in order to accurately predict active layer thickness. Running 
-                    for months where seasonal frost might be present may lead to errouneous estimations of ALT. 
-                    The default is May (5) to October (10). Increasing the number of months will 
-                    increase processing time."),
+                    for months where seasonal frost might be present may lead to errouneous estimations of ALT.months 
+                    must include Septmember (9) inorder to run the module. This is typically the month with the maximum
+                    thaw and therefore should be included when calculated ALT. The default is May (5) to October (10). 
+                    Increasing the number of months will increase processing time."),
     defineParameter("overresolve", "numeric", 1.2, NA, NA, "multiplier than increases the number of grid points beyond
                     the minimum required by grid_ppp. Increasing this value will increase processing time"),
     defineParameter("plot_check", "logical", FALSE, NA, NA, "This replaces the .plot parameter for this module. 
@@ -215,7 +216,30 @@ Init <- function(sim) {
   months <- data.table(
     month = seq(P(sim)$months[1], P(sim)$months[2])
   )
+  if (
+    P(sim)$months[1] < 1 ||
+    P(sim)$months[2] > 12 ||
+    P(sim)$months[1] > P(sim)$months[2]
+  ) {
+    stop(
+      paste0(
+        "Invalid P(sim)$months = c(",
+        P(sim)$months[1], ", ",
+        P(sim)$months[2],
+        "). Months must be between 1 and 12 and the first value must be <= the second."
+      )
+    )
+  }
   
+  if (!9 %in% months$month) {
+    stop(
+      paste0(
+        "Month 9 must be included in the simulation period. ",
+        "Current range is ",
+        P(sim)$months[1], " to ", P(sim)$months[2], "."
+      )
+    )
+  }
   
   ALTparameters <- data.table(NULL)
   ALTparameters <- cross_join(siteParameters, months)
@@ -254,22 +278,23 @@ ALTmaximum <- function(sim) {
     ALTparameters2 <- copy(mod$ALTparameters)
     sim$ALTfinal <- ALTparameters2[
       ,
-      if (all(is.na(ALT))) {
-        if (any(month == 9)) {
-          .SD[month == 9]
+      {
+        # If month 9 exists and ALT is NA, force NA result
+        if (any(month == 9 & is.na(ALT))) {
+          .(ALT = NA_real_)
+        } else if (all(is.na(ALT))) {
+          if (any(month == 9)) {
+            .(ALT = ALT[month == 9][1])
+          } else {
+            .(ALT = NA_real_)
+          }
         } else {
-          .SD[1]
+          .(ALT = max(ALT, na.rm = TRUE))
         }
-      } else {
-        .SD[which.max(replace(ALT, is.na(ALT), -Inf))]
       },
-      by = .(Year, Site)
+      by = .(Year, Site, Class)
     ]
     
-    fwrite(
-      sim$ALTfinal,
-      file.path(outputPath(sim), "ALTfinal.csv")
-    )
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
 }
